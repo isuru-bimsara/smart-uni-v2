@@ -1,0 +1,2 @@
+package com.smart.Uni.enums;
+public enum NotificationType { BOOKING_APPROVED, BOOKING_REJECTED, BOOKING_CANCELLED, TICKET_UPDATED, TICKET_ASSIGNED, GENERAL }
