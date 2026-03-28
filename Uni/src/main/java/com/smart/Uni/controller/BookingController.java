@@ -61,9 +61,15 @@ public class BookingController {
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success("Booking cancelled",
-                bookingService.cancelBooking(id, userDetails.getUsername())));
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        // Check for ADMIN role
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return ResponseEntity.ok(ApiResponse.success(
+                "Booking cancelled",
+                bookingService.cancelBooking(id, userDetails.getUsername(), isAdmin)
+        ));
     }
 
     @GetMapping("/resource/{resourceId}")

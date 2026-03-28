@@ -321,21 +321,23 @@ public class BookingService {
 
     // ✅ Missing method - Cancel booking (by user)
     @Transactional
-    public BookingResponse cancelBooking(Long id, String username) {
+    public BookingResponse cancelBooking(Long id, String username, boolean isAdmin) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
 
-        User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!isAdmin) {
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Verify that the booking belongs to the user trying to cancel it
-        if (!booking.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("You can only cancel your own bookings");
+            // Only the *owner* can cancel if not admin
+            if (!booking.getUser().getId().equals(user.getId())) {
+                throw new RuntimeException("You can only cancel your own bookings");
+            }
         }
 
-        // Only PENDING bookings can be cancelled
-        if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new RuntimeException("Only pending bookings can be cancelled");
+        // Only PENDING or APPROVED bookings can be cancelled
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new RuntimeException("Booking is already cancelled");
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
