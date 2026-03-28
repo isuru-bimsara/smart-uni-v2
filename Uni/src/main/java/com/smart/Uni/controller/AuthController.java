@@ -1,6 +1,9 @@
 package com.smart.Uni.controller;
 
+import com.smart.Uni.dto.request.LoginRequest;
+import com.smart.Uni.dto.request.RegisterRequest;
 import com.smart.Uni.dto.response.ApiResponse;
+import com.smart.Uni.dto.response.AuthResponse;
 import com.smart.Uni.dto.response.UserResponse;
 import com.smart.Uni.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +24,15 @@ public class AuthController {
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(ApiResponse.success(
                 userService.getCurrentUser(userDetails.getUsername())));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(userService.register(request)));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(userService.login(request)));
     }
 }

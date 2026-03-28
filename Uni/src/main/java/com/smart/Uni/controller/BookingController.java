@@ -65,4 +65,13 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success("Booking cancelled",
                 bookingService.cancelBooking(id, userDetails.getUsername())));
     }
+
+    @GetMapping("/resource/{resourceId}")
+    public ResponseEntity<ApiResponse<List<BookingResponse>>> getBookingsByResource(
+            @PathVariable Long resourceId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(bookingService.getBookingsByResource(resourceId))
+        );
+    }
 }
