@@ -146,6 +146,7 @@
 //   );
 // }
 
+//frontend/src/pages/LoginPage.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -158,7 +159,8 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -174,7 +176,7 @@ export default function LoginPage() {
         case "user":
           navigate("/user/dashboard");
           break;
-        case "tech":
+        case "technician":
           navigate("/tech/dashboard");
           break;
         default:
@@ -192,14 +194,22 @@ export default function LoginPage() {
       <div className="max-w-md w-full bg-white shadow-lg rounded-xl p-8 space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-semibold text-gray-900">Welcome back</h1>
-          <p className="text-sm text-gray-500">Sign in with email/password or Google.</p>
+          <p className="text-sm text-gray-500">
+            Sign in with email/password or Google.
+          </p>
         </div>
 
-        {error && <div className="bg-red-50 text-red-700 text-sm p-3 rounded-lg">{error}</div>}
+        {error && (
+          <div className="bg-red-50 text-red-700 text-sm p-3 rounded-lg">
+            {error}
+          </div>
+        )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
@@ -211,7 +221,9 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               name="password"

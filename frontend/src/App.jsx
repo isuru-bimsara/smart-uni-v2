@@ -317,7 +317,7 @@ export default function App() {
 
         {/* Tech Routes */}
         <Route path="/tech/*" element={
-          <ProtectedRoute requiredRole="TECH">
+          <ProtectedRoute requiredRole="TECHNICIAN">
             <TechLayout />
           </ProtectedRoute>
         }>

@@ -1,5 +1,3 @@
-
-
 // // import { useEffect } from "react";
 // // import { useNavigate, useSearchParams } from "react-router-dom";
 // // import { useAuth } from "../context/AuthContext";
@@ -90,21 +88,24 @@ export default function AuthCallback() {
   useEffect(() => {
     const token = searchParams.get("token");
     if (token) {
-      loginWithToken(token).then((user) => {
-        switch (user.role.toLowerCase()) {
-          case "admin":
-            navigate("/admin/dashboard");
-            break;
-          case "user":
-            navigate("/user/dashboard");
-            break;
-          case "tech":
-            navigate("/tech/dashboard");
-            break;
-          default:
-            navigate("/login");
-        }
-      }).catch(() => navigate("/login"));
+      loginWithToken(token)
+        .then((user) => {
+          switch (user.role.toLowerCase()) {
+            case "admin":
+              navigate("/admin/dashboard");
+              break;
+            case "user":
+              navigate("/user/dashboard");
+              break;
+
+            case "technician":
+              navigate("/tech/dashboard");
+              break;
+            default:
+              navigate("/login");
+          }
+        })
+        .catch(() => navigate("/login"));
     } else {
       navigate("/login");
     }

@@ -89,4 +89,23 @@ public class TicketController {
     public ResponseEntity<ApiResponse<List<CommentResponse>>> getComments(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(commentService.getCommentsByTicket(id)));
     }
+
+    // UPDATE: User can update their own ticket
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<TicketResponse>> updateTicket(
+            @PathVariable Long id,
+            @RequestBody @Valid TicketRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success("Ticket updated",
+                ticketService.updateTicketByUser(id, request, userDetails.getUsername())));
+    }
+
+    // DELETE: User can delete their own ticket (if allowed by business logic)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteTicket(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        ticketService.deleteTicketByUser(id, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Ticket deleted", null));
+    }
 }

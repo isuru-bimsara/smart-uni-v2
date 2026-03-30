@@ -149,4 +149,37 @@ public class TicketService {
                 .responseTimeMinutes(responseTime)
                 .build();
     }
+
+    public TicketResponse updateTicketByUser(Long id, TicketRequest request, String email) {
+        Ticket ticket = findTicketById(id);
+        User user = findUserByEmail(email);
+
+        // Allow update only if the user is the reporter (owner)
+        if (!ticket.getReporter().getId().equals(user.getId())) {
+            throw new RuntimeException("You can only update your own tickets.");
+        }
+        // Only allow editing if ticket is OPEN or IN_PROGRESS
+        if (ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED) {
+            throw new RuntimeException("Cannot update a resolved or closed ticket.");
+        }
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        if (request.getCategory() != null) ticket.setCategory(request.getCategory());
+        if (request.getPriority() != null) ticket.setPriority(request.getPriority());
+        Ticket saved = ticketRepository.save(ticket);
+        return toResponse(saved);
+    }
+
+    public void deleteTicketByUser(Long id, String email) {
+        Ticket ticket = findTicketById(id);
+        User user = findUserByEmail(email);
+
+        if (!ticket.getReporter().getId().equals(user.getId())) {
+            throw new RuntimeException("You can only delete your own tickets.");
+        }
+        if (!(ticket.getStatus() == TicketStatus.OPEN || ticket.getStatus() == TicketStatus.IN_PROGRESS)) {
+            throw new RuntimeException("Only open/in-progress tickets can be deleted.");
+        }
+        ticketRepository.deleteById(id);
+    }
 }
