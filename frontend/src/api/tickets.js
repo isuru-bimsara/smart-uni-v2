@@ -15,7 +15,5 @@ export const ticketsApi = {
     api.patch(`/tickets/${id}/assign`, null, { params: { technicianId } }),
   getComments: (id) => api.get(`/tickets/${id}/comments`),
   addComment: (id, content) => api.post(`/tickets/${id}/comments`, { content }),
-  getAssigned: () => api.get("/tickets/assigned"),
-  getAssignedByType: (type) =>
-    api.get("/tickets/assigned", { params: { category: type } }),
+  getByCategory: (category) => api.get(`/tickets/category/${category}`),
 };

@@ -265,7 +265,7 @@
 //   );
 // }
 
-
+//frontend/src/pages/user/UserTickets.jsx
 import { useState, useEffect } from 'react';
 import { ticketsApi } from '../../api/tickets';
 import TicketComments from '../TicketComments';

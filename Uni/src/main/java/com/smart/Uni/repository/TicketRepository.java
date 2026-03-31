@@ -13,6 +13,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByAssigneeId(Long assigneeId);
     List<Ticket> findByStatus(TicketStatus status);
     List<Ticket> findByTitleContainingIgnoreCase(String title);
+    List<Ticket> findByCategory(TicketCategory category);
 
     List<Ticket> findByAssigneeIdAndCategory(Long assigneeId, TicketCategory category);
 }

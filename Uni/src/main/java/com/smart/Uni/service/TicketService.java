@@ -71,17 +71,7 @@ public class TicketService {
         return toResponse(findTicketById(id));
     }
 
-    public TicketResponse updateStatus(Long id, TicketStatus newStatus, String email) {
-        Ticket ticket = findTicketById(id);
-        validateStatusTransition(ticket.getStatus(), newStatus);
-        ticket.setStatus(newStatus);
-        if (newStatus == TicketStatus.RESOLVED || newStatus == TicketStatus.CLOSED) {
-            ticket.setResolvedAt(LocalDateTime.now());
-        }
-        Ticket saved = ticketRepository.save(ticket);
-        notificationService.notifyTicketUpdated(saved);
-        return toResponse(saved);
-    }
+
 
     public TicketResponse assignTicket(Long ticketId, Long technicianId) {
         Ticket ticket = findTicketById(ticketId);
@@ -150,25 +140,26 @@ public class TicketService {
                 .build();
     }
 
-    public TicketResponse updateTicketByUser(Long id, TicketRequest request, String email) {
-        Ticket ticket = findTicketById(id);
-        User user = findUserByEmail(email);
+    public TicketResponse updateStatus(Long id, TicketStatus newStatus, String email) {
 
-        // Allow update only if the user is the reporter (owner)
-        if (!ticket.getReporter().getId().equals(user.getId())) {
-            throw new RuntimeException("You can only update your own tickets.");
+        Ticket ticket = findTicketById(id);
+
+        if (ticket.getStatus() == TicketStatus.CLOSED) {
+            throw new RuntimeException("Closed ticket cannot be changed");
         }
-        // Only allow editing if ticket is OPEN or IN_PROGRESS
-        if (ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED) {
-            throw new RuntimeException("Cannot update a resolved or closed ticket.");
+
+        validateStatusTransition(ticket.getStatus(), newStatus);
+
+        ticket.setStatus(newStatus);
+
+        if (newStatus == TicketStatus.RESOLVED || newStatus == TicketStatus.CLOSED) {
+            ticket.setResolvedAt(LocalDateTime.now());
         }
-        ticket.setTitle(request.getTitle());
-        ticket.setDescription(request.getDescription());
-        if (request.getCategory() != null) ticket.setCategory(request.getCategory());
-        if (request.getPriority() != null) ticket.setPriority(request.getPriority());
-        Ticket saved = ticketRepository.save(ticket);
-        return toResponse(saved);
+
+        return toResponse(ticketRepository.save(ticket));
     }
+
+
 
     public void deleteTicketByUser(Long id, String email) {
         Ticket ticket = findTicketById(id);
@@ -183,35 +174,13 @@ public class TicketService {
         ticketRepository.deleteById(id);
     }
 
-//    // Add this in TicketService
-//    public List<TicketResponse> getAssignedTickets(String email, TicketCategory category) {
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
-//
-//        List<Ticket> tickets;
-//        if (category != null) {
-//            tickets = ticketRepository.findByAssigneeIdAndCategory(user.getId(), category);
-//        } else {
-//            tickets = ticketRepository.findByAssigneeId(user.getId());
-//        }
-//        return tickets.stream().map(this::toResponse).collect(Collectors.toList());
-//    }
-
-    public List<TicketResponse> getAssignedTickets(String email, TicketCategory category) {
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<Ticket> tickets;
-
-        if (category != null) {
-            tickets = ticketRepository.findByAssigneeIdAndCategory(user.getId(), category);
-        } else {
-            tickets = ticketRepository.findByAssigneeId(user.getId());
-        }
-
-        return tickets.stream().map(this::toResponse).collect(Collectors.toList());
+    public List<TicketResponse> getTicketsByCategory(TicketCategory category) {
+        return ticketRepository.findByCategory(category)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
+
 
 
 }
