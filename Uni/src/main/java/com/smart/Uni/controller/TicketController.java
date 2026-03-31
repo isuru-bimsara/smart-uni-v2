@@ -110,24 +110,5 @@ public class TicketController {
         return ResponseEntity.ok(ApiResponse.success("Ticket deleted", null));
     }
 
-//    @GetMapping("/assigned")
-//    @PreAuthorize("hasRole('TECHNICIAN')")
-//    public ResponseEntity<ApiResponse<List<TicketResponse>>> getAssignedTickets(
-//            @AuthenticationPrincipal UserDetails userDetails,
-//            @RequestParam(value="category", required = false) TicketCategory category) {
-//        return ResponseEntity.ok(ApiResponse.success(ticketService.getAssignedTickets(userDetails.getUsername(), category)));
-//    }
 
-@GetMapping("/assigned")
-@PreAuthorize("hasRole('TECHNICIAN')")
-public ResponseEntity<ApiResponse<List<TicketResponse>>> getAssignedTickets(
-        @AuthenticationPrincipal UserDetails userDetails,
-        @RequestParam(value="category", required = false) TicketCategory category) {
-
-    return ResponseEntity.ok(
-            ApiResponse.success(
-                    ticketService.getAssignedTickets(userDetails.getUsername(), category)
-            )
-    );
-}
 }
