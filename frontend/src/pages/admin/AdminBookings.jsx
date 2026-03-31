@@ -35,6 +35,7 @@
 //   )
 // }
 
+//frontend/src/pages/admin/AdminBookings.jsx
 import { useState, useEffect } from 'react';
 import { bookingsApi } from '../../api/bookings';
 import { formatDistanceToNowStrict } from 'date-fns';

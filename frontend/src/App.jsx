@@ -17,6 +17,7 @@ import AdminBookings from "./pages/admin/AdminBookings";
 import AdminResources from "./pages/admin/AdminResources";
 import AdminTickets from "./pages/admin/AdminTickets";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 // User Pages
 import UserDashboard from "./pages/user/UserDashboard";
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="resources" element={<AdminResources />} />
+          <Route path="users" element={<AdminUsers />} />
           <Route path="tickets" element={<AdminTickets />} />
           <Route path="notifications" element={<AdminNotifications />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
