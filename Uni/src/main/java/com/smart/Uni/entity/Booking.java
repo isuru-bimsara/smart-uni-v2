@@ -38,6 +38,8 @@ public class Booking {
     private String purpose;
     private String qrCode;
 
+    private String rejectReason;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

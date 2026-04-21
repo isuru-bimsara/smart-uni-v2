@@ -18,5 +18,6 @@ public class BookingResponse {
     private BookingStatus status;
     private String purpose;
     private String qrCode;
+    private String rejectReason;
     private LocalDateTime createdAt;
 }

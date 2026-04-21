@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import com.smart.Uni.dto.request.RejectRequest;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -36,7 +38,7 @@ public class BookingController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('OPERATION_MANAGER')")
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getAllBookings() {
         return ResponseEntity.ok(ApiResponse.success(bookingService.getAllBookings()));
     }
@@ -47,15 +49,17 @@ public class BookingController {
     }
 
     @PatchMapping("/{id}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('OPERATION_MANAGER')")
     public ResponseEntity<ApiResponse<BookingResponse>> approveBooking(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("Booking approved", bookingService.approveBooking(id)));
     }
 
     @PatchMapping("/{id}/reject")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<BookingResponse>> rejectBooking(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Booking rejected", bookingService.rejectBooking(id)));
+    @PreAuthorize("hasRole('OPERATION_MANAGER')")
+    public ResponseEntity<ApiResponse<BookingResponse>> rejectBooking(
+            @PathVariable Long id,
+            @Valid @RequestBody RejectRequest rejectRequest) {
+        return ResponseEntity.ok(ApiResponse.success("Booking rejected", bookingService.rejectBooking(id, rejectRequest.getReason())));
     }
 
     @PatchMapping("/{id}/cancel")
@@ -63,9 +67,9 @@ public class BookingController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        // Check for ADMIN role
+        // Check for OPERATION_MANAGER role (has admin-level cancel rights)
         boolean isAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_OPERATION_MANAGER"));
         return ResponseEntity.ok(ApiResponse.success(
                 "Booking cancelled",
                 bookingService.cancelBooking(id, userDetails.getUsername(), isAdmin)
@@ -79,5 +83,12 @@ public class BookingController {
         return ResponseEntity.ok(
                 ApiResponse.success(bookingService.getBookingsByResource(resourceId))
         );
+    }
+
+    @GetMapping("/resource/{resourceId}/date/{date}")
+    public ResponseEntity<ApiResponse<List<BookingResponse>>> getBookingsByResourceAndDate(
+            @PathVariable Long resourceId,
+            @PathVariable LocalDate date) {
+        return ResponseEntity.ok(ApiResponse.success(bookingService.getBookingsByResourceAndDate(resourceId, date)));
     }
 }

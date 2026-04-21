@@ -93,13 +93,14 @@ public class BookingService {
         return mapToResponse(updated);
     }
 
-    // ✅ Missing method - Reject booking
+    // ✅ Updated method - Reject booking with reason
     @Transactional
-    public BookingResponse rejectBooking(Long id) {
+    public BookingResponse rejectBooking(Long id, String reason) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
 
         booking.setStatus(BookingStatus.REJECTED);
+        booking.setRejectReason(reason);
         Booking updated = bookingRepository.save(booking);
         notificationService.notifyBookingRejected(updated);
         return mapToResponse(updated);
@@ -141,6 +142,17 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    public List<BookingResponse> getBookingsByResourceAndDate(Long resourceId, java.time.LocalDate date) {
+        java.time.LocalDateTime startOfDay = date.atStartOfDay();
+        java.time.LocalDateTime endOfDay = date.atTime(23, 59, 59);
+
+        return bookingRepository.findByResourceIdAndStartTimeBetween(resourceId, startOfDay, endOfDay)
+                .stream()
+                .filter(b -> b.getStatus() != BookingStatus.CANCELLED && b.getStatus() != BookingStatus.REJECTED)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private BookingResponse mapToResponse(Booking b) {
         return BookingResponse.builder()
                 .id(b.getId())
@@ -152,6 +164,7 @@ public class BookingService {
                 .endTime(b.getEndTime())
                 .status(b.getStatus())
                 .purpose(b.getPurpose())
+                .rejectReason(b.getRejectReason())
                 .createdAt(b.getCreatedAt())
                 .build();
     }
