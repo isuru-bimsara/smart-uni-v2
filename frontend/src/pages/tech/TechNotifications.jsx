@@ -163,7 +163,8 @@ import {
   Circle,
   CheckCircle2,
   BellOff,
-  ChevronRight
+  ChevronRight,
+  Trash2,
 } from "lucide-react";
 import useNotificationClick from "../../utils/useNotificationClick";
 
@@ -203,6 +204,28 @@ export default function TechNotifications() {
     try {
       await notificationsApi.markAllAsRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this notification?")) return;
+    try {
+      await notificationsApi.delete(id);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!window.confirm("Are you sure you want to delete all notifications?"))
+      return;
+    try {
+      await notificationsApi.deleteAll();
+      setNotifications([]);
     } catch (e) {
       console.error(e);
     }
@@ -248,15 +271,26 @@ export default function TechNotifications() {
           </p>
         </div>
 
-        {unreadCount > 0 && (
-          <button
-            onClick={handleMarkAllRead}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-600 bg-white border border-slate-200 hover:bg-indigo-50 rounded-xl transition-all shadow-sm"
-          >
-            <CheckCheck className="w-4 h-4" />
-            Clear All Alerts
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {unreadCount > 0 && (
+            <button
+              onClick={handleMarkAllRead}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-600 bg-white border border-slate-200 hover:bg-indigo-50 rounded-xl transition-all shadow-sm"
+            >
+              <CheckCheck className="w-4 h-4" />
+              Mark all read
+            </button>
+          )}
+          {notifications.length > 0 && (
+            <button
+              onClick={handleDeleteAll}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-rose-600 bg-white border border-slate-200 hover:bg-rose-50 rounded-xl transition-all shadow-sm"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear All
+            </button>
+          )}
+        </div>
       </div>
 
       {/* NOTIFICATION BOX */}
@@ -323,9 +357,18 @@ export default function TechNotifications() {
                   </div>
                 </div>
 
-                {/* Click Hint Icon */}
-                <div className="self-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ChevronRight className="w-5 h-5 text-slate-300" />
+                {/* Click Hint Icon & Delete */}
+                <div className="self-center flex items-center gap-2">
+                  <button
+                    onClick={(e) => handleDelete(e, n.id)}
+                    className="opacity-0 group-hover:opacity-100 p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ChevronRight className="w-5 h-5 text-slate-300" />
+                  </div>
                 </div>
               </div>
             ))}

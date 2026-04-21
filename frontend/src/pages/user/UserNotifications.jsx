@@ -300,6 +300,7 @@ import {
   Circle,
   BellOff,
   Check,
+  Trash2,
 } from "lucide-react";
 import useNotificationClick from "../../utils/useNotificationClick";
 
@@ -340,6 +341,27 @@ export default function UserNotifications() {
     try {
       await notificationsApi.markAllAsRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm("Delete this notification?")) return;
+    try {
+      await notificationsApi.delete(id);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!window.confirm("Are you sure you want to delete all notifications?"))
+      return;
+    try {
+      await notificationsApi.deleteAll();
+      setNotifications([]);
     } catch (e) {
       console.error(e);
     }
@@ -404,14 +426,25 @@ export default function UserNotifications() {
           </p>
         </div>
 
-        {unreadCount > 0 && (
-          <button
-            onClick={handleMarkAllRead}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-600 hover:bg-indigo-50 bg-white border border-slate-200 rounded-xl transition-all shadow-sm"
-          >
-            <CheckCheck className="w-4 h-4" />
-            Mark all read
-          </button>
+        {notifications.length > 0 && (
+          <div className="flex items-center gap-2">
+            {unreadCount > 0 && (
+              <button
+                onClick={handleMarkAllRead}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-600 hover:bg-indigo-50 bg-white border border-slate-200 rounded-xl transition-all shadow-sm"
+              >
+                <CheckCheck className="w-4 h-4" />
+                Mark all read
+              </button>
+            )}
+            <button
+              onClick={handleDeleteAll}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-rose-600 hover:bg-rose-50 bg-white border border-slate-200 rounded-xl transition-all shadow-sm"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear All
+            </button>
+          </div>
         )}
       </div>
 
@@ -482,6 +515,14 @@ export default function UserNotifications() {
                                   <Circle className="w-2.5 h-2.5 fill-indigo-600 text-indigo-600 animate-pulse" />
                                 </div>
                               )}
+
+                              <button
+                                onClick={(e) => handleDelete(e, n.id)}
+                                className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                title="Delete notification"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </div>
 
                             <div className="flex items-center gap-3 text-xs mt-2">

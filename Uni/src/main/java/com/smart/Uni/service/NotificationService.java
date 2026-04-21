@@ -11,6 +11,8 @@ import com.smart.Uni.repository.NotificationRepository;
 import com.smart.Uni.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -176,11 +178,25 @@ public class NotificationService {
         return toResponse(notificationRepository.save(notification));
     }
 
+    @Transactional
     public void markAllAsRead(String email) {
         User user = findUserByEmail(email);
         List<Notification> unread = notificationRepository.findByUserIdAndReadFalse(user.getId());
         unread.forEach(n -> n.setRead(true));
         notificationRepository.saveAll(unread);
+    }
+
+    public void deleteNotification(Long id, String email) {
+        User user = findUserByEmail(email);
+        Notification notification = notificationRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
+        notificationRepository.delete(notification);
+    }
+
+    @Transactional
+    public void deleteAllNotifications(String email) {
+        User user = findUserByEmail(email);
+        notificationRepository.deleteByUserId(user.getId());
     }
 
     /* ---------- INTERNAL HELPERS ---------- */
