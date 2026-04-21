@@ -121,6 +121,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -143,6 +144,7 @@ public class ResourceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('OPERATION_MANAGER')")
     public ResponseEntity<?> create(@RequestBody ResourceRequest request,
                                     @AuthenticationPrincipal UserDetails userDetails) {
         String actorEmail = userDetails != null ? userDetails.getUsername() : null;
@@ -150,6 +152,7 @@ public class ResourceController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('OPERATION_MANAGER')")
     public ResponseEntity<?> update(@PathVariable Long id,
                                     @RequestBody ResourceRequest request,
                                     @AuthenticationPrincipal UserDetails userDetails) {
@@ -158,6 +161,7 @@ public class ResourceController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('OPERATION_MANAGER')")
     public ResponseEntity<?> delete(@PathVariable Long id,
                                     @AuthenticationPrincipal UserDetails userDetails) {
         String actorEmail = userDetails != null ? userDetails.getUsername() : null;
@@ -166,6 +170,7 @@ public class ResourceController {
     }
 
     @PostMapping("/upload")
+    @PreAuthorize("hasRole('OPERATION_MANAGER')")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
         try {
             File dir = new File(uploadDir);

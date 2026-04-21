@@ -93,7 +93,7 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     @Builder.Default
     private UserRole role = UserRole.USER;
 

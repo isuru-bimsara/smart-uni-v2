@@ -311,7 +311,7 @@ import {
   X,
 } from "lucide-react";
 
-const ROLES = ["USER", "TECHNICIAN", "ADMIN"];
+const ROLES = ["USER", "TECHNICIAN", "ADMIN", "OPERATION_MANAGER"];
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -462,6 +462,8 @@ export default function AdminUsers() {
         return "bg-purple-100 text-purple-700 border-purple-200";
       case "TECHNICIAN":
         return "bg-blue-100 text-blue-700 border-blue-200";
+      case "OPERATION_MANAGER":
+        return "bg-emerald-100 text-emerald-700 border-emerald-200";
       default:
         return "bg-gray-100 text-gray-600 border-gray-200";
     }

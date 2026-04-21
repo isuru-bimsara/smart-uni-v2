@@ -199,6 +199,11 @@ export default function UserBookings() {
                           {status.icon}
                           {b.status}
                         </span>
+                        {b.status === "REJECTED" && b.rejectReason && (
+                          <p className="text-[10px] text-rose-500 font-bold mt-2 max-w-[150px] mx-auto italic">
+                            Reason: {b.rejectReason}
+                          </p>
+                        )}
                       </td>
                     </tr>
                   );

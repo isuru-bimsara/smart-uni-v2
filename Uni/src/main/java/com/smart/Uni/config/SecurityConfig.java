@@ -180,14 +180,23 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
 
-                        // Resource endpoints (your current rule)
-                        .requestMatchers("/api/resources/**").permitAll()
+                        // Resource READ is open to all authenticated users (users need to browse resources)
+                        .requestMatchers(HttpMethod.GET, "/api/resources/**").authenticated()
+                        // Resource WRITE/DELETE requires OPERATION_MANAGER (defence-in-depth; @PreAuthorize also guards)
+                        .requestMatchers(HttpMethod.POST, "/api/resources/**").hasRole("OPERATION_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/resources/**").hasRole("OPERATION_MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/resources/**").hasRole("OPERATION_MANAGER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/resources/**").hasRole("OPERATION_MANAGER")
 
-                        // Role-based endpoints
+                        // Booking management (approve/reject/all) — guarded via @PreAuthorize on methods
+                        .requestMatchers("/api/bookings/**").authenticated()
+
+                        // Operation Manager dedicated endpoints
+                        .requestMatchers("/api/operation-manager/**").hasRole("OPERATION_MANAGER")
+
+                        // Admin-only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/technician/**").hasAnyRole("ADMIN", "TECHNICIAN")
-
-                        .requestMatchers("/api/bookings/**").authenticated()
 
                         // Everything else
                         .anyRequest().authenticated()

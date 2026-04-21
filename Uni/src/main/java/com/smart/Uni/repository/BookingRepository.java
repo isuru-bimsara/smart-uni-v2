@@ -64,4 +64,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     );
     long countByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
 
+    List<Booking> findByResourceIdAndStartTimeBetween(Long resourceId, LocalDateTime start, LocalDateTime end);
 }

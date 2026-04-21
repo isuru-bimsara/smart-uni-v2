@@ -24,7 +24,7 @@ public class NotificationService {
     /* ---------- PUBLIC NOTIFIERS ---------- */
 
     public void notifyBookingPending(Booking booking) {
-        notifyAdmins(
+        notifyAdminsAndOps(
                 "New booking pending approval for resource: " + booking.getResource().getName(),
                 NotificationType.BOOKING_PENDING,
                 booking.getId());
@@ -36,8 +36,11 @@ public class NotificationService {
     }
 
     public void notifyBookingRejected(Booking booking) {
-        createNotification(booking.getUser(), NotificationType.BOOKING_REJECTED,
-                "Your booking for " + booking.getResource().getName() + " has been rejected.", booking.getId());
+        String msg = "Your booking for " + booking.getResource().getName() + " has been rejected.";
+        if (booking.getRejectReason() != null && !booking.getRejectReason().isBlank()) {
+            msg += " Reason: " + booking.getRejectReason();
+        }
+        createNotification(booking.getUser(), NotificationType.BOOKING_REJECTED, msg, booking.getId());
     }
 
     public void notifyBookingCancelled(Booking booking) {
@@ -127,21 +130,21 @@ public class NotificationService {
     }
 
     public void notifyResourceCreated(Resource resource, User actor) {
-        notifyAdmins(
+        notifyAdminsAndOps(
                 (actor != null ? actor.getName() : "An admin") + " created resource: " + resource.getName(),
                 NotificationType.RESOURCE_CREATED,
                 resource.getId());
     }
 
     public void notifyResourceUpdated(Resource resource, User actor) {
-        notifyAdmins(
+        notifyAdminsAndOps(
                 (actor != null ? actor.getName() : "An admin") + " updated resource: " + resource.getName(),
                 NotificationType.RESOURCE_UPDATED,
                 resource.getId());
     }
 
     public void notifyResourceDeleted(Long resourceId, String resourceName, User actor) {
-        notifyAdmins(
+        notifyAdminsAndOps(
                 (actor != null ? actor.getName() : "An admin") + " deleted resource: " + resourceName,
                 NotificationType.RESOURCE_DELETED,
                 resourceId);
@@ -183,8 +186,12 @@ public class NotificationService {
     /* ---------- INTERNAL HELPERS ---------- */
 
     private void notifyAdmins(String message, NotificationType type, Long relatedId) {
-        List<User> admins = userRepository.findByRole(UserRole.ADMIN);
-        admins.forEach(a -> createNotification(a, type, message, relatedId));
+        notifyByRole(UserRole.ADMIN, message, type, relatedId);
+    }
+
+    private void notifyAdminsAndOps(String message, NotificationType type, Long relatedId) {
+        notifyByRole(UserRole.ADMIN, message, type, relatedId);
+        notifyByRole(UserRole.OPERATION_MANAGER, message, type, relatedId);
     }
 
     private void notifyByRole(UserRole role, String message, NotificationType type, Long relatedId) {
