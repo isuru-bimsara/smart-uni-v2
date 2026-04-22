@@ -15,6 +15,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { useNotifications } from "../../context/NotificationContext";
+import useNotificationClick from "../../utils/useNotificationClick";
+
 
 
 export default function OpsNotifications() {
@@ -22,6 +24,8 @@ export default function OpsNotifications() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("ALL"); // ALL | UNREAD | READ
   const { fetchUnreadCount } = useNotifications();
+  const handleNotificationClick = useNotificationClick(setNotifications, "OPERATION_MANAGER");
+
 
 
   const sortNotifications = useCallback((data) => {
@@ -216,8 +220,9 @@ export default function OpsNotifications() {
             return (
               <div
                 key={n.id}
-                onClick={() => handleMarkAsRead(n)}
+                onClick={() => handleNotificationClick(n)}
                 className={`group relative flex items-start gap-4 p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${
+
                   n.read
                     ? "bg-white border-slate-100 opacity-60"
                     : "bg-white border-emerald-100 shadow-md shadow-emerald-50/60 hover:shadow-lg ring-1 ring-emerald-50"

@@ -1,7 +1,9 @@
 
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { bookingsApi } from "../../api/bookings";
+
 import { formatDistanceToNowStrict } from "date-fns";
 import {
   Calendar,
@@ -15,7 +17,9 @@ import {
 export default function AdminBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
   const [selectedBooking, setSelectedBooking] = useState(null);
+
 
   // Fetch bookings
   const fetchBookings = async () => {
@@ -42,6 +46,15 @@ export default function AdminBookings() {
     const interval = setInterval(fetchBookings, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  // ✅ Auto-select booking if ID in URL
+  useEffect(() => {
+    const bookingId = searchParams.get("bookingId");
+    if (bookingId && bookings.length > 0) {
+      const b = bookings.find((item) => String(item.id) === String(bookingId));
+      if (b) setSelectedBooking(b);
+    }
+  }, [searchParams, bookings]);
 
   // Handle booking actions
   const handleStatusChange = async (id, action) => {

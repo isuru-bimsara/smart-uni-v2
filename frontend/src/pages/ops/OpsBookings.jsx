@@ -2,7 +2,9 @@
 // Booking management page for OPERATION_MANAGER role.
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { bookingsApi } from "../../api/bookings";
+
 import { formatDistanceToNowStrict } from "date-fns";
 import {
   CalendarCheck,
@@ -29,7 +31,9 @@ export default function OpsBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = useState("ALL");
+
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [rejectModal, setRejectModal] = useState({ open: false, id: null, reason: "" });
@@ -56,6 +60,15 @@ export default function OpsBookings() {
     const interval = setInterval(fetchBookings, 60_000);
     return () => clearInterval(interval);
   }, []);
+
+  // ✅ Auto-select booking if ID in URL
+  useEffect(() => {
+    const bookingId = searchParams.get("bookingId");
+    if (bookingId && bookings.length > 0) {
+      const b = bookings.find((item) => String(item.id) === String(bookingId));
+      if (b) setSelectedBooking(b);
+    }
+  }, [searchParams, bookings]);
 
   const handleAction = async (id, action, reason = "") => {
     if (action === "reject" && !reason) {
